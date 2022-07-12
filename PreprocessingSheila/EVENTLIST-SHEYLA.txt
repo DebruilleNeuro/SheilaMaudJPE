@@ -1,0 +1,3 @@
+    7             "FD"     1                 "FD"
+    2             "TD"     2                 "TD"
+    5		     "Alone"   3		        "Alone"
