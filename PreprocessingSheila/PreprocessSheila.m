@@ -98,7 +98,7 @@ for i=1:length(file_name)
             
         elseif j==2 %human 2 0,1hz 50hz filters
             nameset = ['0.1HZ_' name_temp(1:2) '_P2' '.'];
-            nameerp = [name_temp(1:2) '_P1' '.erp'];
+            nameerp = [name_temp(1:2) '_P2' '.erp'];
             electrodes= [33:56];
             frontals= [29:32];
             placingelectrode = {'nch1 = ch29 label Fp2',  'nch2 = ch30 label Fp1',  'nch3 = ch31 label F8',  'nch4 = ch32 label F7',...
