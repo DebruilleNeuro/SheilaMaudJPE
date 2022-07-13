@@ -225,6 +225,7 @@ for i=1:length(file_name)
         EEG  = pop_artflatline( EEG , 'Channel', electrodes, 'Duration',  100, 'Flag',  1, 'Threshold', [ -1e-07 1e-07], 'Twindow', [ -204 1000] );
         EEG  = pop_artflatline( EEG , 'Channel', frontals, 'Duration',  100, 'Flag',  1, 'Threshold', [ -1e-07 1e-07], 'Twindow', [ -204 1000] );
         
+        pop_summary_rejectfields(EEG)
         %close;
         EEG = pop_saveset( EEG, [nameset] ,[pwd]);
         
@@ -232,20 +233,21 @@ for i=1:length(file_name)
         ERP = pop_averager( EEG , 'Criterion', 'good', 'DSindex',1, 'ExcludeBoundary', 'on', 'SEM', 'on' );
         
         % placing the electrodes for plot
-        ERP = pop_erpchanoperator( ERP, placingelectrode );
+        %ERP = pop_erpchanoperator( ERP, placingelectrode );
         
         % load channel location information
         ERP = pop_erpchanedit( ERP, [currentDirectory '/Chanloc28.ced']);
         
         % Save the erp
         ERP = pop_savemyerp(ERP, 'erpname', nameerp, 'filename', nameerp, 'filepath', [pwd], 'Warning', 'on');
-        ERP = pop_summary_AR_erp_detection(ERP, [currentDirectory nameerp '.txt']);
+        ERP = pop_summary_AR_erp_detection(ERP, [currentDirectory nameerp(1:end-4) '.txt']);
         ERP = pop_summary_rejectfields(EEG);
         
         if j==2
-            
+            break
+                 
         end
-        fprintf(':) done :)');
     end
- end
+    
+end
 
