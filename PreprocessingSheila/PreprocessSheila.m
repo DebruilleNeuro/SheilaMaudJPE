@@ -1,3 +1,4 @@
+%script to process sheila
 clear all
 close all
 clc
@@ -21,14 +22,6 @@ for i=1:length(filesList)
     [folder, baseFileName, extension] = fileparts(filesList(i).name);
     [onlyFileNames{i}] = baseFileName;
 end
-%disp(onlyFileNames);
-
-% fid = fopen('Trials_tarlan alone.csv','w');
-% c = 'Participants ID \t |TRIALS(2 3 4 5)|'
-% fprintf(fid, c);
-% fprintf(fid, '\n');
-
-
 
 for i=1:length(file_name)
     %initializing variable %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -95,13 +88,12 @@ for i=1:length(file_name)
                 'nch16 = ch16 label Ft8',  'nch17 = ch17 label Ft7',  'nch18 = ch18 label Fc4',  'nch19 = ch19 label Fc3',  'nch20 = ch20 label Fcz',  'nch21 = ch21 label C4',...
                 'nch22 = ch22 label C3',  'nch23 = ch23 label Tp8',  'nch24 = ch24 label Tp7',  'nch25 = ch25 label Cp4',  'nch26 = ch26 label Cp3',...
                 'nch27 = ch27 label O2',  'nch28 = ch28 label O1'};
-            EEG = pop_eegchanoperator(EEG, placingelectrode);
+            EEG = pop_eegchanoperator(EEG, placingelectrode);%placing electrodes
             EEG = pop_editset(EEG, 'run', [], 'chanlocs', [pwd '/Chanloc28.ced']);
-            
             % filter data
-            EEGSET = pop_eegfiltnew( EEGSET, [], 50, [], false, [], 0);
-            EEGSET = pop_eegfiltnew( EEGSET, 0.1, [], [], false, [], 0);
-            EEG = pop_saveset(EEG,[nameset],[currentDirectory])
+            EEGSET = pop_eegfiltnew( EEGSET, [], 50, [], false, [], 0); %50hz
+            EEGSET = pop_eegfiltnew( EEGSET, 0.1, [], [], false, [], 0); %0.1hz
+            EEG = pop_saveset(EEG,[nameset],[currentDirectory]) %save
             [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, 0 );
             
         elseif j==2 %human 2 0,1hz 50hz filters
@@ -134,7 +126,7 @@ for i=1:length(file_name)
                 'nch16 = ch16 label Ft8',  'nch17 = ch17 label Ft7',  'nch18 = ch18 label Fc4',  'nch19 = ch19 label Fc3',  'nch20 = ch20 label Fcz',  'nch21 = ch21 label C4',...
                 'nch22 = ch22 label C3',  'nch23 = ch23 label Tp8',  'nch24 = ch24 label Tp7',  'nch25 = ch25 label Cp4',  'nch26 = ch26 label Cp3',...
                 'nch27 = ch27 label O2',  'nch28 = ch28 label O1'};
-            EEG = pop_eegchanoperator(EEG, placingelectrode);
+            EEG = pop_eegchanoperator(EEG, placingelectrode); %placing electrodes
             % filter data
             EEGSET = pop_eegfiltnew( EEGSET, 1, [], [], false, [], 0);
             EEG = pop_editset(EEG, 'run', [], 'chanlocs', [pwd '/Chanloc28.ced']);%load channel location info
@@ -152,7 +144,7 @@ for i=1:length(file_name)
                 'nch16 = ch44 label Ft8',  'nch17 = ch45 label Ft7',  'nch18 = ch46 label Fc4',  'nch19 = ch47 label Fc3',  'nch20 = ch48 label Fcz',  'nch21 = ch49 label C4',...
                 'nch22 = ch50 label C3',  'nch23 = ch51 label Tp8',  'nch24 = ch52 label Tp7',  'nch25 = ch53 label Cp4',  'nch26 = ch54 label Cp3',...
                 'nch27 = ch55 label O2', 'nch28 = ch56 label O1'};
-            EEG = pop_eegchanoperator(EEG, placingelectrode);
+            EEG = pop_eegchanoperator(EEG, placingelectrode); %placing electrodes
             % filter data
             EEGSET = pop_eegfiltnew( EEGSET, 1, [], [], false, [], 0);
             EEG = pop_editset(EEG, 'run', [], 'chanlocs', [pwd '/Chanloc28.ced']);%load channel location info
@@ -166,22 +158,26 @@ for i=1:length(file_name)
     
     
     
-    %% Human 1 and 2 (ICA, Artifact rejection)
+    %% Human 1 and 2 (ICA, Artifact rejection) 
+    %loop for H1 & H2. If you prefer, participants can be done one by one
+    %using the commented out parts
     for j=1:2
-        %j==1 %initializing variables
+        %j==1 participant 1
+        %j==2 participant 2
+        %initializing variables
         nameerp = [];
         nameset = [];
         nameerp = [name_temp(1:2) '_P' int2str(j) '.erp'];
         nameset = [name_temp(1:2) '_P' int2str(j) '.set'];
         
         EEG = pop_loadset('filename',['1HZ_' name_temp(1:2) '_P' int2str(j) '.set'],'filepath',[pwd]); %load 1hz dataset for ICA
-        % automatic channel rejection
+        % automatic channel rejection        
         pop_rejchan(EEG)
-        EEG = pop_rejchan(EEG, 'elec',[1:28] ,'threshold',5,'norm','on','measure','prob'); %automatic rejection parameters
-        %not working: parameters to select test 'probability'
+        EEG = pop_rejchan(EEG, 'elec',[1:28],'measure','prob','norm','on','threshold',5); %automatic rejection parameters
+        %!!!not working: parameters to select measure 'probability'
         fprintf('If *bad* channels exist, remove them from brackets in pop_runica')
         %% run ICA
-        % MANUAL MANIPULATION Chanind remove *bad* electrode from brackets to run ica e.g.[1:23 25:28] %24
+        %!!! MANUAL MANIPULATION Chanind remove *bad* electrode from brackets to run ica e.g.[1:23 25:28] %24
         EEG = pop_runica(EEG, 'icatype', 'runica', 'chanind', [1:28], 'extended',1); %  change chanind to reject bad electrode if needed
         EEG = pop_saveset( EEG, 'filename',['ICA_1HZ_' name_temp(1:2) '_P' int2str(j) '.set'],'filepath',[pwd]); %save set
         
@@ -200,8 +196,7 @@ for i=1:length(file_name)
         clear TMP;
         EEG = pop_saveset(EEG, 'filename',['ICA_0.1HZ_' name_temp(1:2) '_P' int2str(j) '.set'], 'filepath', [pwd]); %save 0.1hz+ICA matrix .set
         
-        fprintf('For next section: Be careful when removing components. Potential manual check')
-        %%  IMPORTANT when 'reject component' window pops up, before rejecting need to label components manually (PRECAUTION to avoid errors: to make sure correct .set file loaded, and that correct components were labeled 90% Muscle or Eye probability, other components are not removed.)
+        %% !!! when 'reject component' window pops up, before rejecting need to label components manually (precaution)
         EEG = pop_loadset('filename', ['ICA_0.1HZ_' name_temp(1:2) '_P' int2str(j) '.set'], 'filepath', [pwd]);
         %IC component rejection
         EEG=iclabel(EEG);
@@ -214,7 +209,7 @@ for i=1:length(file_name)
         
         % check bad channels again
         pop_rejchan(EEG)
-        fprintf('For next section: Remove *bad electrodes from brackets')
+        fprintf('In next section: Remove *bad electrodes from brackets')
         %% artifact detection
         
         %%%!! exclude *bad* electrodes, comment which electrode(s) and restore
@@ -230,7 +225,6 @@ for i=1:length(file_name)
         EEG  = pop_artflatline( EEG , 'Channel', electrodes, 'Duration',  100, 'Flag',  1, 'Threshold', [ -1e-07 1e-07], 'Twindow', [ -204 1000] );
         EEG  = pop_artflatline( EEG , 'Channel', frontals, 'Duration',  100, 'Flag',  1, 'Threshold', [ -1e-07 1e-07], 'Twindow', [ -204 1000] );
         
-        pop_summary_rejectfields(EEG)
         %close;
         EEG = pop_saveset( EEG, [nameset] ,[pwd]);
         
@@ -238,27 +232,20 @@ for i=1:length(file_name)
         ERP = pop_averager( EEG , 'Criterion', 'good', 'DSindex',1, 'ExcludeBoundary', 'on', 'SEM', 'on' );
         
         % placing the electrodes for plot
-        %ERP = pop_erpchanoperator( ERP, placingelectrode );
+        ERP = pop_erpchanoperator( ERP, placingelectrode );
         
         % load channel location information
         ERP = pop_erpchanedit( ERP, [currentDirectory '/Chanloc28.ced']);
         
         % Save the erp
         ERP = pop_savemyerp(ERP, 'erpname', nameerp, 'filename', nameerp, 'filepath', [pwd], 'Warning', 'on');
-        ERP = pop_summary_AR_erp_detection(ERP, [currentDirectory nameerp(1:end-4) '.txt']);
+        ERP = pop_summary_AR_erp_detection(ERP, [currentDirectory nameerp '.txt']);
         ERP = pop_summary_rejectfields(EEG);
         
         if j==2
-            break
-            %break
-            % reply = input('Do you want to do participant 2? Y/N [Y]: ','s');
-            % if isempty(reply)
-            %     reply = 'Y';
-            %
-            
             
         end
+        fprintf(':) done :)');
     end
-    
-end
+ end
 
