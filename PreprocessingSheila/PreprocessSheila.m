@@ -1,4 +1,4 @@
-%Script to preprocess Sheila's data. Version2022.2
+%Script to preprocess Sheila's data. Version2022.3
 
 %Input: Iwave files (ic.asc.eeglab.data.txt and ic.asc.eeglab.events.txt).
 %!!Input file name: Pair number needs to be characters 1:2 (ie paire 1= 01...txt)
@@ -170,7 +170,7 @@ j=1; % participant 1
 nameerp = [];
 nameset = [];
 
-EEG = pop_loadset('filename',['1HZ_' name_temp(1:2) '_P' int2str(j) '.set'],'filepath',[pwd]); %load 1hz dataset for ICA
+EEG = pop_loadset('filename',['1HZ_' name_temp(1:2) '_S' int2str(j) '.set'],'filepath',[pwd]); %load 1hz dataset for ICA
 nameerp = [name_temp(1:2) '_S' int2str(j) '.erp'];
 nameset = [name_temp(1:2) '_S' int2str(j) '.set'];
 EEG = pop_editset(EEG, 'run', [], 'chanlocs', [pwd '/Chanloc28.ced']);%load channel location info
@@ -213,9 +213,17 @@ EEG = pop_subcomp( EEG ); %manual check
 EEG = pop_saveset(EEG, 'filename',['ICs_ICA_0.1HZ_' name_temp(1:2) '_S' int2str(j) '.set'], 'filepath', [pwd]); %set 0.1hz filter + ICA + bad ICs removed
 
 % check bad channels again
-EEG = pop_rejchan(EEG, 'elec',[1:28],'measure','prob','norm','on','threshold',5); %automatic rejection parameters
+%EEG = pop_rejchan(EEG, 'elec',[1:28],'measure','prob','norm','on','threshold',5); %automatic rejection parameters
+
+          [EEG,indelec] = pop_rejchan(EEG,'elec',[1:28],'threshold',5,'norm','on','measure','prob');
+                                EEG = eeg_interp(EEG,indelec)
+                                [EEG,EEG.reject.indelec] = pop_rejchan(EEG,'elec',[1:28],'threshold',5,'norm','on','measure','prob');
+                                EEG = eeg_interp(EEG,EEG.reject.indelec)
+
+
 fprintf('In next section: Remove *bad electrodes from brackets')
 %% artifact detection
+
 
 %%%!! exclude *bad* electrodes, comment which electrode(s) and restore
 %%%after participant is done
@@ -295,7 +303,13 @@ EEG = pop_subcomp( EEG ); %manual check
 EEG = pop_saveset(EEG, 'filename',['ICs_ICA_0.1HZ_' name_temp(1:2) '_S' int2str(j) '.set'], 'filepath', [pwd]); %set 0.1hz filter + ICA + bad ICs removed
 
 % check bad channels again
-EEG = pop_rejchan(EEG, 'elec',[1:28],'measure','prob','norm','on','threshold',5); %automatic rejection parameters
+%EEG = pop_rejchan(EEG, 'elec',[1:28],'measure','prob','norm','on','threshold',5); %automatic rejection parameters
+
+[EEG,indelec] = pop_rejchan(EEG,'elec',[1:28],'threshold',5,'norm','on','measure','prob');
+                                EEG = eeg_interp(EEG,indelec)
+                                [EEG,EEG.reject.indelec] = pop_rejchan(EEG,'elec',[1:28],'threshold',5,'norm','on','measure','prob');
+                                EEG = eeg_interp(EEG,EEG.reject.indelec)
+                                
 fprintf('In next section: Remove *bad electrodes from brackets')
 %% artifact detection
 
