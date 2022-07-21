@@ -213,7 +213,8 @@ EEG = pop_subcomp( EEG ); %manual check
 EEG = pop_saveset(EEG, 'filename',['ICs_ICA_0.1HZ_' name_temp(1:2) '_S' int2str(j) '.set'], 'filepath', [pwd]); %set 0.1hz filter + ICA + bad ICs removed
 
 % check bad channels again
-EEG = pop_rejchan(EEG, 'elec',[1:28],'measure','prob','norm','on','threshold',5); %automatic rejection parameters
+EEG = pop_rejchan(EEG)
+%EEG = pop_rejchan(EEG, 'elec',[1:28],'measure','prob','norm','on','threshold',5); %automatic rejection parameters
 
 %           [EEG,indelec] = pop_rejchan(EEG,'elec',[1:28],'threshold',5,'norm','on','measure','prob');
 %                                 EEG = eeg_interp(EEG,indelec)
