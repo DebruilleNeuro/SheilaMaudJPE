@@ -1,4 +1,4 @@
-%Script to preprocess Sheila's data. Version2022.3
+%Script to preprocess Sheila's data. Version2022.4
 
 %Input: Iwave files (ic.asc.eeglab.data.txt and ic.asc.eeglab.events.txt).
 %!!Input file name: Pair number needs to be characters 1:2 (ie paire 1= 01...txt)
@@ -210,20 +210,11 @@ EEG = pop_icflag(EEG, noisethreshold);
 % remove bad component(s)
 EEG = pop_subcomp( EEG ); %manual check
 % save
-%EEG = pop_saveset(EEG, 'filename',['ICs_ICA_0.1HZ_' name_temp(1:2) '_S' int2str(j) '.set'], 'filepath', [pwd]); %set 0.1hz filter + ICA + bad ICs removed
+EEG = pop_saveset(EEG, 'filename',['ICs_ICA_0.1HZ_' name_temp(1:2) '_S' int2str(j) '.set'], 'filepath', [pwd]); %set 0.1hz filter + ICA + bad ICs removed
 
 % check bad channels again
-EEG = pop_rejchan(EEG, 'elec',[1:28],'measure','prob','norm','on','threshold',5); %automatic rejection parameters
-
-%           [EEG,indelec] = pop_rejchan(EEG,'elec',[1:28],'threshold',5,'norm','on','measure','prob');
-%                                 EEG = eeg_interp(EEG,indelec)
-%                                 [EEG,EEG.reject.indelec] = pop_rejchan(EEG,'elec',[1:28],'threshold',5,'norm','on','measure','prob');
-%                                 EEG = eeg_interp(EEG,EEG.reject.indelec)
-TMP = pop_loadset('filename', ['ICA_0.1HZ_' name_temp(1:2) '_S' int2str(j) '.set'], 'filepath', [pwd]); % Template before channel removal
-EEG = pop_loadset('filename', ['ICA_0.1HZ_' name_temp(1:2) '_S' int2str(j) '.set'], 'filepath', [pwd]);% Dataset with missing channels
-EEG = pop_interp( EEG, TMP.chanlocs );
-EEG = pop_saveset(EEG, 'filename',['ICs_ICA_0.1HZ_' name_temp(1:2) '_S' int2str(j) '.set'], 'filepath', [pwd]); %set 0.1hz filter + ICA + bad ICs removed
- % Dataset with interpolated channels
+EEG = pop_rejchan(EEG)
+%EEG = pop_rejchan(EEG, 'elec',[1:28],'measure','prob','norm','on','threshold',5); %automatic rejection parameters
 
 fprintf('In next section: Remove *bad electrodes from brackets')
 %% artifact detection
@@ -231,7 +222,7 @@ fprintf('In next section: Remove *bad electrodes from brackets')
 
 %%%!! exclude *bad* electrodes, comment which electrode(s) and restore
 %%%after participant is done
-frontals = [2:4]; %1
+frontals = [1 3:4]; %2
 electrodes=[5:15 16:17 18:28];%take note of which electrode is removed
 
 %peak to peak (frontal elec and other elec)
@@ -302,23 +293,14 @@ EEG=iclabel(EEG);
 noisethreshold = [0 0;0.9 1; 0.9 1; 0 0; 0 0; 0 0; 0 0]; %IC label parameters: 90% Muscle and Eye probability;
 EEG = pop_icflag(EEG, noisethreshold);
 % remove bad component(s)
-EEG = pop_subcomp( EEG ); %manual check
+EEG = pop_subcomp( EEG ); 
 % save
-%EEG = pop_saveset(EEG, 'filename',['ICs_ICA_0.1HZ_' name_temp(1:2) '_S' int2str(j) '.set'], 'filepath', [pwd]); %set 0.1hz filter + ICA + bad ICs removed
+EEG = pop_saveset(EEG, 'filename',['ICs_ICA_0.1HZ_' name_temp(1:2) '_S' int2str(j) '.set'], 'filepath', [pwd]); %set 0.1hz filter + ICA + bad ICs removed
 
 % check bad channels again
-EEG = pop_rejchan(EEG, 'elec',[1:28],'measure','prob','norm','on','threshold',5); %automatic rejection parameters
-
-%           [EEG,indelec] = pop_rejchan(EEG,'elec',[1:28],'threshold',5,'norm','on','measure','prob');
-%                                 EEG = eeg_interp(EEG,indelec)
-%                                 [EEG,EEG.reject.indelec] = pop_rejchan(EEG,'elec',[1:28],'threshold',5,'norm','on','measure','prob');
-%                                 EEG = eeg_interp(EEG,EEG.reject.indelec)
-TMP = pop_loadset('filename', ['ICA_0.1HZ_' name_temp(1:2) '_S' int2str(j) '.set'], 'filepath', [pwd]); % Template before channel removal
-EEG = pop_loadset('filename', ['ICA_0.1HZ_' name_temp(1:2) '_S' int2str(j) '.set'], 'filepath', [pwd]);% Dataset with missing channels
-EEG = pop_interp( EEG, TMP.chanlocs );
-EEG = pop_saveset(EEG, 'filename',['ICs_ICA_0.1HZ_' name_temp(1:2) '_S' int2str(j) '.set'], 'filepath', [pwd]); %set 0.1hz filter + ICA + bad ICs removed
- % Dataset with interpolated channels     EEG = eeg_interp(EEG,EEG.reject.indelec)
-                                
+EEG = pop_rejchan(EEG) 
+%, 'elec',[1:28],'measure','prob','norm','on','threshold',5); %automatic rejection parameters
+                               
 fprintf('In next section: Remove *bad electrodes from brackets')
 %% artifact detection
 
